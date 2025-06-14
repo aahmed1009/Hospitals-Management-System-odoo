@@ -1,4 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <record id="view_hms_patient_form" model="ir.ui.view">
+        <field name="name">hms.patient.form</field>
+        <field name="model">hms.patient</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <sheet>
+                    <group>
+                        <field name="first_name"/>
+                        <field name="last_name"/>
+                        <field name="birth_date"/>
+                        <field name="age"/>
+                        <field name="address"/>
+                        <field name="department_id"/>
+                        <field name="department_capacity" readonly="1"/>
+                        <field name="doctor_ids" widget="many2many_tags" readonly="department_id == False"/>
+                        <field name="blood_type"/>
+                        <field name="cr_ratio" required="pcr"/>
+                        <field name="pcr"/>
+                        <field name="show_history" invisible="1"/> <!-- Added this field but hidden -->
+                        <field name="history" invisible="not show_history"/>
+                        <field name="state"/>
+                        <field name="image" widget="image"/>
+                    </group>
+                    <notebook>
+                        <page string="Log History">
+                            <field name="log_ids" readonly="1">
+                                <tree>
+                                    <field name="created_by" readonly="1"/>
+                                    <field name="date" readonly="1"/>
+                                    <field name="description" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record id="view_hms_patient_tree" model="ir.ui.view">
         <field name="name">hms.patient.tree</field>
         <field name="model">hms.patient</field>
@@ -6,35 +46,11 @@
             <tree>
                 <field name="first_name"/>
                 <field name="last_name"/>
-                <field name="age"/>
-                <field name="blood_type"/>
+                <field name="department_id"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
-
-    <record id="view_hms_patient_form" model="ir.ui.view">
-        <field name="name">hms.patient.form</field>
-        <field name="model">hms.patient</field>
-        <field name="arch" type="xml">
-            <form>
-                <group>
-                    <field name="first_name"/>
-                    <field name="last_name"/>
-                    <field name="birth_date"/>
-                    <field name="age"/>
-                    <field name="address"/>
-                    <field name="history"/>
-                    <field name="cr_ratio"/>
-                    <field name="blood_type"/>
-                    <field name="pcr"/>
-                    <field name="image"/>
-                </group>
-            </form>
-        </field>
-    </record>
-
-    <menuitem id="hms_root_menu" name="HMS"/>
-    <menuitem id="hms_patient_menu" name="Patients" parent="hms_root_menu"/>
 
     <record id="action_hms_patient" model="ir.actions.act_window">
         <field name="name">Patients</field>
@@ -42,5 +58,6 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="hms_patient_menu_action" name="Patients" parent="hms_patient_menu" action="action_hms_patient"/>
+    <menuitem id="menu_hms_root" name="Hospital Management"/>
+    <menuitem id="menu_hms_patient" name="Patients" parent="menu_hms_root" action="action_hms_patient"/>
 </odoo>
