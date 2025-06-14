@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+
     <record id="view_hms_patient_form" model="ir.ui.view">
         <field name="name">hms.patient.form</field>
         <field name="model">hms.patient</field>
@@ -18,7 +19,7 @@
                         <field name="blood_type"/>
                         <field name="cr_ratio" required="pcr"/>
                         <field name="pcr"/>
-                        <field name="show_history" invisible="1"/> <!-- Added this field but hidden -->
+                        <field name="show_history" invisible="1"/>
                         <field name="history" invisible="not show_history"/>
                         <field name="state"/>
                         <field name="image" widget="image"/>
@@ -60,4 +61,5 @@
 
     <menuitem id="menu_hms_root" name="Hospital Management"/>
     <menuitem id="menu_hms_patient" name="Patients" parent="menu_hms_root" action="action_hms_patient"/>
+
 </odoo>
