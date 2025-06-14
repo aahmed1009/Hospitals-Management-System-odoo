@@ -1,0 +1,16 @@
+# --- odo CLI ---
+# odo stores file-sync state here; never commit it
+.odo/
+pgdata/
+# When odo adds its index files one-by-one, ignore them too
+.odo/odo-file-index.json
+.odo/env
+.odo/push.yaml
+
+# If you prefer to keep a dedicated .odoignore file instead
+# make sure the .odo dir itself is listed there as well.
+#
+# Other patterns follow your stack; e.g. add:
+#   node_modules/      for Node
+#   target/            for Maven
+#   __pycache__/ *.pyc for Python
