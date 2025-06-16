@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- Tree View Extension -->
+        <record id="view_partner_tree_hms" model="ir.ui.view">
+            <field name="name">res.partner.tree.hms</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[1]" position="after">
+                    <field name="website"/>
+                    <field name="tax_id"/>
+                    <field name="related_patient_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Form View Extension -->
+        <record id="view_partner_form_hms" model="ir.ui.view">
+            <field name="name">res.partner.form.hms</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='misc']" position="after">
+                    <group string="Hospital Management">
+                        <field name="related_patient_id"/>
+                        <field name="tax_id" required="1"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Search View Extension -->
+        <record id="view_partner_search_hms" model="ir.ui.view">
+            <field name="name">res.partner.search.hms</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <field name="related_patient_id"/>
+                    <filter name="linked_patients" string="With Patient Link" domain="[('related_patient_id','!=',False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Custom Action -->
+        <record id="action_hms_linked_partners" model="ir.actions.act_window">
+            <field name="name"> Partners</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('related_patient_id', '!=', False)]</field>
+        </record>
+
+        <!-- Menu Item -->
+        <menuitem id="menu_hms_linked_partners"
+                  name="Linked Partners"
+                  parent="menu_hms_root"
+                  sequence="20"
+                  action="action_hms_linked_partners"/>
+
+    </data>
+</odoo>

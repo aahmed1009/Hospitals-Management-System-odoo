@@ -1,14 +1,19 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+import re
+from datetime import date
 
 class HmsPatient(models.Model):
     _name = 'hms.patient'
     _description = 'Hospital Patient'
+    _sql_constraints = [
+        ('unique_email', 'UNIQUE(email)', 'Email address must be unique.')
+    ]
 
     first_name = fields.Char(string='First Name', required=True)
     last_name = fields.Char(string='Last Name', required=True)
     birth_date = fields.Date(string='Birth Date')
-    age = fields.Integer(string='Age')
+    age = fields.Integer(string='Age', compute='_compute_age', store=True, readonly=True)
     history = fields.Html(string='History')
     show_history = fields.Boolean(compute="_compute_show_history")
     cr_ratio = fields.Float(string='CR Ratio')
@@ -18,6 +23,7 @@ class HmsPatient(models.Model):
     pcr = fields.Boolean(string='PCR')
     image = fields.Binary(string='Image')
     address = fields.Text(string='Address')
+    email = fields.Char(string='Email')  # ➕ Added field
     state = fields.Selection([
         ('undetermined', 'Undetermined'),
         ('good', 'Good'),
@@ -28,8 +34,7 @@ class HmsPatient(models.Model):
     department_id = fields.Many2one('hms.department', string="Department")
     doctor_ids = fields.Many2many('hms.doctor', string="Doctors")
     log_ids = fields.One2many('hms.patient.log', 'patient_id', string="Logs")
-
-    department_capacity = fields.Integer(related='department_id.capacity', string="Department Capacity", readonly=True)
+    department_capacity = fields.Integer(related='department_id.capacity', readonly=True)
 
     @api.depends('age')
     def _compute_show_history(self):
@@ -64,6 +69,13 @@ class HmsPatient(models.Model):
             if record.pcr and not record.cr_ratio:
                 raise ValidationError("CR Ratio is required when PCR is checked.")
 
+    @api.constrains('email')
+    def _check_valid_email(self):
+        pattern = r"[^@]+@[^@]+\.[^@]+"
+        for record in self:
+            if record.email and not re.match(pattern, record.email):
+                raise ValidationError("Please provide a valid email address.")
+
     @api.onchange('state')
     def _onchange_state(self):
         if self.state:
@@ -72,3 +84,13 @@ class HmsPatient(models.Model):
                 'date': fields.Datetime.now()
             }
             self.log_ids = [(0, 0, log_vals)]
+    @api.depends('birth_date')
+    def _compute_age(self):
+        for record in self:
+            if record.birth_date:
+                today = date.today()
+                born = record.birth_date
+                # Calculate age
+                record.age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+            else:
+                record.age = 0

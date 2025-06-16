@@ -1,65 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <data>
 
-    <record id="view_hms_patient_form" model="ir.ui.view">
-        <field name="name">hms.patient.form</field>
-        <field name="model">hms.patient</field>
-        <field name="arch" type="xml">
-            <form string="Patient">
-                <sheet>
-                    <group>
-                        <field name="first_name"/>
-                        <field name="last_name"/>
-                        <field name="birth_date"/>
-                        <field name="age"/>
-                        <field name="address"/>
-                        <field name="department_id"/>
-                        <field name="department_capacity" readonly="1"/>
-                        <field name="doctor_ids" widget="many2many_tags" readonly="department_id == False"/>
-                        <field name="blood_type"/>
-                        <field name="cr_ratio" required="pcr"/>
-                        <field name="pcr"/>
-                        <field name="show_history" invisible="1"/>
-                        <field name="history" invisible="not show_history"/>
-                        <field name="state"/>
-                        <field name="image" widget="image"/>
-                    </group>
-                    <notebook>
-                        <page string="Log History">
-                            <field name="log_ids" readonly="1">
-                                <tree>
-                                    <field name="created_by" readonly="1"/>
-                                    <field name="date" readonly="1"/>
-                                    <field name="description" readonly="1"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
+        <!-- ========== HMS PATIENT FORM & TREE VIEWS ========== -->
+        <record id="view_hms_patient_form" model="ir.ui.view">
+            <field name="name">hms.patient.form</field>
+            <field name="model">hms.patient</field>
+            <field name="arch" type="xml">
+                <form string="Patient">
+                    <sheet>
+                        <group>
+                            <field name="first_name"/>
+                            <field name="last_name"/>
+                            <field name="email"/>
+                            <field name="birth_date"/>
+                            <field name="age"/>
+                            <field name="address"/>
+                            <field name="department_id"/>
+                            <field name="department_capacity" readonly="1"/>
+                            <field name="doctor_ids" widget="many2many_tags" readonly="department_id == False"/>
+                            <field name="blood_type"/>
+                            <field name="cr_ratio" required="pcr"/>
+                            <field name="pcr"/>
+                            <field name="show_history" invisible="1"/>
+                            <field name="history" invisible="not show_history"/>
+                            <field name="state"/>
+                            <field name="image" widget="image"/>
+                        </group>
+                        <notebook>
+                            <page string="Log History">
+                                <field name="log_ids" readonly="1">
+                                    <tree>
+                                        <field name="created_by" readonly="1"/>
+                                        <field name="date" readonly="1"/>
+                                        <field name="description" readonly="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-    <record id="view_hms_patient_tree" model="ir.ui.view">
-        <field name="name">hms.patient.tree</field>
-        <field name="model">hms.patient</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="first_name"/>
-                <field name="last_name"/>
-                <field name="department_id"/>
-                <field name="state"/>
-            </tree>
-        </field>
-    </record>
+        <record id="view_hms_patient_tree" model="ir.ui.view">
+            <field name="name">hms.patient.tree</field>
+            <field name="model">hms.patient</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="first_name"/>
+                    <field name="last_name"/>
+                    <field name="department_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
 
-    <record id="action_hms_patient" model="ir.actions.act_window">
-        <field name="name">Patients</field>
-        <field name="res_model">hms.patient</field>
-        <field name="view_mode">tree,form</field>
-    </record>
+        <record id="action_hms_patient" model="ir.actions.act_window">
+            <field name="name">Patients</field>
+            <field name="res_model">hms.patient</field>
+            <field name="view_mode">tree,form</field>
+        </record>
 
-    <menuitem id="menu_hms_root" name="Hospital Management"/>
-    <menuitem id="menu_hms_patient" name="Patients" parent="menu_hms_root" action="action_hms_patient"/>
+        <!-- ========== MENU ROOT ========== -->
+        <menuitem id="menu_hms_root" name="Hospital Management" sequence="10"/>
+        <menuitem id="menu_hms_patient" name="Patients" parent="menu_hms_root" action="action_hms_patient" sequence="10"/>
 
+
+        <!-- ========== LINKED PARTNERS ========== -->
+        <record id="action_hms_linked_partners" model="ir.actions.act_window">
+            <field name="name">Linked Partners</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('related_patient_id', '!=', False)]</field>
+            <field name="context">{'search_default_filter_linked_patients': 1}</field>
+        </record>
+
+        <menuitem id="menu_hms_linked_partners" name="Linked Partners" parent="menu_hms_root" action="action_hms_linked_partners" sequence="20"/>
+
+    </data>
 </odoo>
