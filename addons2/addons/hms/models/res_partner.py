@@ -2,65 +2,69 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import re
 
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     related_patient_id = fields.Many2one(
         'hms.patient',
         string='Related Patient',
-        tracking=True
+        tracking=True,
+        index=True
     )
 
     tax_id = fields.Char(
         string='Tax ID',
-        tracking=True
+        tracking=True,
+        index=True
     )
 
     _sql_constraints = [
-        ('email_uniq', 'UNIQUE(email)', 'Email must be unique.'),
-        ('tax_id_uniq', 'UNIQUE(tax_id)', 'Tax ID must be unique.')
+        ('email_uniq', 'UNIQUE(email)', 'Email address must be unique!'),
+        ('tax_id_uniq', 'UNIQUE(tax_id)', 'Tax ID must be unique!')
     ]
 
     @api.constrains('email')
     def _check_unique_email(self):
         for rec in self.filtered('email'):
+            email = rec.email.strip().lower()
             existing = self.search([
-                ('email', '=', rec.email),
-                ('id', '!=', rec.id)
+                ('id', '!=', rec.id),
+                ('email', '=', email)
             ], limit=1)
             if existing:
-                raise ValidationError(f"Email '{rec.email}' is already used by {existing.name}.")
+                raise ValidationError(f"Email '{email}' is already used by {existing.name}.")
 
     @api.constrains('related_patient_id')
     def _check_unique_patient_email(self):
         for rec in self.filtered('related_patient_id'):
             patient_email = (rec.related_patient_id.email or '').strip().lower()
             if patient_email:
-                duplicate = self.search([
+                existing = self.search([
                     ('id', '!=', rec.id),
                     ('related_patient_id.email', '=', patient_email)
                 ], limit=1)
-                if duplicate:
+                if existing:
                     raise ValidationError(
-                        f"The patient email '{patient_email}' is already linked to another customer: '{duplicate.name}'."
+                        f"The patient email '{patient_email}' is already linked to another customer: {existing.name}"
                     )
 
     @api.constrains('tax_id')
-    def _check_tax_id_required(self):
+    def _check_tax_id_required_for_customers(self):
         for rec in self:
-            if rec.is_company and not rec.tax_id:
-                raise ValidationError("Tax ID is required for companies.")
+            if rec.customer_rank > 0 and not rec.tax_id:
+                raise ValidationError("Tax ID is required for customers.")
 
     @api.constrains('tax_id')
     def _check_tax_id_format(self):
         for rec in self.filtered('tax_id'):
             if len(rec.tax_id.strip()) < 3:
-                raise ValidationError("Tax ID must be at least 3 characters.")
+                raise ValidationError("Tax ID must be at least 3 characters long.")
 
     def unlink(self):
-        protected = self.filtered('related_patient_id')
-        if protected:
-            raise ValidationError(
-                "You cannot delete a customer linked to a patient. Unlink the patient first."
-            )
+        for rec in self:
+            if rec.related_patient_id:
+                raise ValidationError(
+                    f"You cannot delete customer '{rec.name}' because they are linked to patient '{rec.related_patient_id.name}'."
+                )
         return super().unlink()

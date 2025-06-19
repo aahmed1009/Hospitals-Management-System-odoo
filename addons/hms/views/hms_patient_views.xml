@@ -77,6 +77,6 @@
         </record>
 
         <menuitem id="menu_hms_linked_partners" name="Linked Partners" parent="menu_hms_root" action="action_hms_linked_partners" sequence="20"/>
-
+ 
     </data>
 </odoo>

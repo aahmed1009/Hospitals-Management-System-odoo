@@ -2,13 +2,13 @@
 <odoo>
     <data>
 
-        <!-- Tree View Extension -->
+        <!-- Tree View Inheritance -->
         <record id="view_partner_tree_hms" model="ir.ui.view">
             <field name="name">res.partner.tree.hms</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//tree/field[1]" position="after">
+                <xpath expr="//field[@name='name']" position="after">
                     <field name="website"/>
                     <field name="tax_id"/>
                     <field name="related_patient_id"/>
@@ -16,48 +16,48 @@
             </field>
         </record>
 
-        <!-- Form View Extension -->
+        <!-- Form View Inheritance -->
         <record id="view_partner_form_hms" model="ir.ui.view">
             <field name="name">res.partner.form.hms</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='misc']" position="after">
-                    <group string="Hospital Management">
-                        <field name="related_patient_id"/>
-                        <field name="tax_id" required="1"/>
-                    </group>
+                <xpath expr="//page[@name='sales_purchases']//group[@name='misc']" position="inside">
+                    <field name="related_patient_id"/>
+                    <field name="tax_id" required="1"/>
                 </xpath>
             </field>
         </record>
 
-        <!-- Search View Extension -->
+        <!-- Search View Inheritance -->
         <record id="view_partner_search_hms" model="ir.ui.view">
             <field name="name">res.partner.search.hms</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_res_partner_filter"/>
             <field name="arch" type="xml">
                 <xpath expr="//search" position="inside">
+                    <field name="tax_id"/>
                     <field name="related_patient_id"/>
                     <filter name="linked_patients" string="With Patient Link" domain="[('related_patient_id','!=',False)]"/>
                 </xpath>
             </field>
         </record>
 
-        <!-- Custom Action -->
+        <!-- Action to open filtered customers -->
         <record id="action_hms_linked_partners" model="ir.actions.act_window">
-            <field name="name"> Partners</field>
+            <field name="name">Linked Patients</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('related_patient_id', '!=', False)]</field>
+            <field name="domain">[('related_patient_id','!=',False)]</field>
+            <field name="context">{}</field>
         </record>
 
-        <!-- Menu Item -->
+        <!-- Menu under Hospital App -->
+        <menuitem id="menu_hms_root" name="Hospital" sequence="10"/>
         <menuitem id="menu_hms_linked_partners"
                   name="Linked Partners"
                   parent="menu_hms_root"
-                  sequence="20"
-                  action="action_hms_linked_partners"/>
-
+                  action="action_hms_linked_partners"
+                  sequence="20"/>
     </data>
 </odoo>
