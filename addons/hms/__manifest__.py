@@ -8,7 +8,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        'reports/patient_report.xml',  # MUST come before views
+        'reports/patient_report.xml',  
         'views/hms_patient_views.xml',
         'views/hms_doctor_views.xml',
         'views/hms_department_views.xml',
