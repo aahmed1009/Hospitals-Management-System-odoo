@@ -2,7 +2,7 @@
     'name': 'Hospital Management System',
     'version': '1.0',
     'summary': 'Manage Patients in HMS',
-    'author': 'Your Name',
+       'author': 'Alaa Ahmed',
     'category': 'Healthcare',
     'depends': ['base'],
     'data': [
